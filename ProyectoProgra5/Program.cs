@@ -50,32 +50,32 @@ app.MapPost("/Login", async (Usuario usu, ProyectoProgra5Context context, string
     try
     {
         if (!MiniValidator.TryValidate(usu, out var errors))
+                    {
+                        return Results.BadRequest(new { codigo = -2, mensaje = StatusCodes.Status404NotFound, errores = errors });
+                   }
+
+            if (await context.Usuarios.AnyAsync<Usuario>(S => S.Usuario1 == id && S.Contraseña == contraseña))
         {
-            return Results.BadRequest(new { codigo = -2, mensaje = StatusCodes.Status404NotFound, errores = errors });
+            await context.SaveChangesAsync();
+                       return Results.Ok(
+                           new
+                           {
+                               codigo = 0,
+                               usu = usu,
+                               mensaje = StatusCodes.Status200OK,
+                           });
         }
-
-        await context.Usuarios.AnyAsync<Usuario>(S => S.Usuario1 == id && S.Contraseña == contraseña);
-        await context.SaveChangesAsync();
-        return Results.Ok(
- new
- {
-     codigo = 0,
-     usu = usu,
-     mensaje = StatusCodes.Status200OK,
- });
     }
-    catch (Exception exc)
+    catch (Exception)
     {
-        return Results.Json(new
-        {
-            codigo = -1,
-            mensaje = StatusCodes.Status409Conflict
-        },
-        statusCode: StatusCodes.Status409Conflict);
 
+        throw;
     }
+    return Results.NotFound();
 
+   
 });
+
 //Mantenimiento Servidores
 app.MapPost("/Servidor", async ([FromBody] Servidor serv, ProyectoProgra5Context context) =>
 {
@@ -165,20 +165,9 @@ app.MapPost("/ParametrosServidore", async ([FromBody] ParametrosServidore serv, 
     }
     catch (Exception exc)
     {
-        throw new Exception(exc.InnerException.ToString());
         return Results.Json(new { codigo = -1, mensaje = exc.Message },
         statusCode: StatusCodes.Status500InternalServerError);
     }
-    //catch (Exception exc)
-    //{
-    //    return Results.Json(new
-    //    {
-    //        codigo = -1,
-    //        mensaje = StatusCodes.Status409Conflict
-    //    },
-    //    statusCode: StatusCodes);
-
-    //}
 
 });
 app.MapGet("ParametrosServidore/{IdServidor}", async (int Servidores, ProyectoProgra5Context context) =>
@@ -234,7 +223,7 @@ app.MapPost("/Servicio", async ([FromBody] Servicio para, ProyectoProgra5Context
     statusCode: StatusCodes.Status500InternalServerError);
     }
 });
-app.MapGet("Servicio/{CodigoServidor}", async (int Codigo, ProyectoProgra5Context context) =>
+app.MapGet("Servicio/{CodigoServicio}", async (int Codigo, ProyectoProgra5Context context) =>
 {
     if (await context.Servicios.AnyAsync<Servicio>(x => x.CodigoServidor == Codigo))
     {
@@ -407,6 +396,111 @@ app.MapPost("/EncargadoServidores", async ([FromBody] EncargadoServidore Enser, 
         },
     statusCode: StatusCodes.Status500InternalServerError);
     }
+});
+
+//Dashboard Servidores
+// Encargado Servidores
+app.MapPost("/DasboardServidores", async ([FromBody] DashboardServidore mon, ProyectoProgra5Context context) =>
+{
+    try
+    {
+        if (!MiniValidator.TryValidate(mon, out var errors))
+        {
+            return Results.BadRequest(new { codigo = -2, mensaje = StatusCodes.Status404NotFound, errores = errors });
+        }
+        await context.DashboardServidores.AddAsync(mon);
+        await context.SaveChangesAsync();
+        //context.Entry(para).Reference(c => c.EstadoNavigation).Load();
+        return Results.Created($"/Servidores/{mon.Iddashboard}",
+ new
+ {
+     codigo = 0,
+     mensaje = StatusCodes.Status201Created,
+     mon = mon,
+ });
+    }
+    catch (Exception exc)
+    {
+        return Results.Json(new
+        {
+            codigo = -1,
+            mensaje = exc.Message
+        },
+    statusCode: StatusCodes.Status500InternalServerError);
+    }
+});
+
+app.MapGet("/DashboardServidores", async (int Codigo, ProyectoProgra5Context context) =>
+{
+    if (await context.Servidors.AnyAsync<Servidor>(x => x.Codigo == Codigo))
+    {
+
+        var query = from  s  in context.Servidors
+                    join mon in context.DashboardServidores on s.Codigo equals mon.CodigoServidor
+                    select new
+                    {
+                        Codigo = s.Codigo,
+                        Nombre=s.Nombre,
+                        FechaUltimoMonitoreo = mon.FechaUltimomonitoreo,
+                        UsoCPU = mon.UsoCpu,
+                        UsoDisco = mon.UsoDisco,
+                        UsoMemoria=mon.UsoMemoria
+                    };
+        return Results.Ok(query);
+    }
+    return Results.NotFound();
+});
+
+//Dashboard Servicios
+app.MapPost("/DashboardServicios", async ([FromBody] DashboardServicio mon, ProyectoProgra5Context context) =>
+{
+    try
+    {
+        if (!MiniValidator.TryValidate(mon, out var errors))
+        {
+            return Results.BadRequest(new { codigo = -2, mensaje = StatusCodes.Status404NotFound, errores = errors });
+        }
+        await context.DashboardServicios.AddAsync(mon);
+        await context.SaveChangesAsync();
+        //context.Entry(para).Reference(c => c.EstadoNavigation).Load();
+        return Results.Created($"/Servidores/{mon.IdDashboard}",
+ new
+ {
+     codigo = 0,
+     mensaje = StatusCodes.Status201Created,
+     mon = mon,
+ });
+    }
+    catch (Exception exc)
+    {
+        return Results.Json(new
+        {
+            codigo = -1,
+            mensaje = exc.Message
+        },
+    statusCode: StatusCodes.Status500InternalServerError);
+    }
+});
+
+app.MapGet("/DashboardServicios", async (int Codigo, ProyectoProgra5Context context) =>
+{
+    if (await context.Servicios.AnyAsync<Servicio>(x => x.Codigo == Codigo))
+    {
+
+        var query = from s in context.Servicios
+                    join mon in context.DashboardServicios on s.Codigo equals mon.CodigoServicio
+                    select new
+                    {
+                        Codigo = s.Codigo,
+                        Nombre = s.Nombre,
+                        FechaUltimoMonitoreo = mon.FechaMonitoreo,
+                        Timeout = mon.Timeout,
+                        Disponiblidad = mon.Disponibilidad,
+                        Parametros = mon.InformacionParametros
+                    };
+        return Results.Ok(query);
+    }
+    return Results.NotFound();
 });
 app.Run();
 
