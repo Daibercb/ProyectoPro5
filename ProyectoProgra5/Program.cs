@@ -295,6 +295,12 @@ app.MapPost("/emails", async (string asuntoCorreo, string cuerpoCorreo, string[]
                     MailAddress to = new MailAddress(user.Correo);
                     mensaje.To.Add(to);
                 }
+                else if (await context.EncargadoServicios.AnyAsync(x => x.Alerta == true))
+                {
+                    Usuario user = await context.Usuarios.FirstOrDefaultAsync(x => x.Usuario1 == u);
+                    MailAddress to = new MailAddress(user.Correo);
+                    mensaje.To.Add(to);
+                }
             }
         }
         smtp.Send(mensaje); return Results.Ok(new { mensaje ="Correo Enviado" });
@@ -400,7 +406,7 @@ app.MapPost("/EncargadoServidores", async ([FromBody] EncargadoServidore Enser, 
 
 //Dashboard Servidores
 // Encargado Servidores
-app.MapPost("/DasboardServidores", async ([FromBody] DashboardServidore mon, ProyectoProgra5Context context) =>
+app.MapPost("/MonitoreoServidores", async ([FromBody] DashboardServidore mon, ProyectoProgra5Context context) =>
 {
     try
     {
@@ -452,7 +458,7 @@ app.MapGet("/DashboardServidores", async (int Codigo, ProyectoProgra5Context con
 });
 
 //Dashboard Servicios
-app.MapPost("/DashboardServicios", async ([FromBody] DashboardServicio mon, ProyectoProgra5Context context) =>
+app.MapPost("/MonitoreoServicios", async ([FromBody] DashboardServicio mon, ProyectoProgra5Context context) =>
 {
     try
     {
