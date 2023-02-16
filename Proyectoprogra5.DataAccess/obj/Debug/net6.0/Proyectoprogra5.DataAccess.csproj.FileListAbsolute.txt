@@ -1,0 +1,14 @@
+C:\Users\Daiber CB\Desktop\ProyectoProgra5\Proyectoprogra5.DataAccess\bin\Debug\net6.0\Proyectoprogra5.DataAccess.deps.json
+C:\Users\Daiber CB\Desktop\ProyectoProgra5\Proyectoprogra5.DataAccess\bin\Debug\net6.0\Proyectoprogra5.DataAccess.runtimeconfig.json
+C:\Users\Daiber CB\Desktop\ProyectoProgra5\Proyectoprogra5.DataAccess\bin\Debug\net6.0\Proyectoprogra5.DataAccess.dll
+C:\Users\Daiber CB\Desktop\ProyectoProgra5\Proyectoprogra5.DataAccess\bin\Debug\net6.0\Proyectoprogra5.DataAccess.pdb
+C:\Users\Daiber CB\Desktop\ProyectoProgra5\Proyectoprogra5.DataAccess\obj\Debug\net6.0\Proyectoprogra5.DataAccess.csproj.AssemblyReference.cache
+C:\Users\Daiber CB\Desktop\ProyectoProgra5\Proyectoprogra5.DataAccess\obj\Debug\net6.0\Proyectoprogra5.DataAccess.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Daiber CB\Desktop\ProyectoProgra5\Proyectoprogra5.DataAccess\obj\Debug\net6.0\Proyectoprogra5.DataAccess.AssemblyInfoInputs.cache
+C:\Users\Daiber CB\Desktop\ProyectoProgra5\Proyectoprogra5.DataAccess\obj\Debug\net6.0\Proyectoprogra5.DataAccess.AssemblyInfo.cs
+C:\Users\Daiber CB\Desktop\ProyectoProgra5\Proyectoprogra5.DataAccess\obj\Debug\net6.0\Proyectoprogra5.DataAccess.csproj.CoreCompileInputs.cache
+C:\Users\Daiber CB\Desktop\ProyectoProgra5\Proyectoprogra5.DataAccess\obj\Debug\net6.0\Proyectoprogra5.DataAccess.dll
+C:\Users\Daiber CB\Desktop\ProyectoProgra5\Proyectoprogra5.DataAccess\obj\Debug\net6.0\refint\Proyectoprogra5.DataAccess.dll
+C:\Users\Daiber CB\Desktop\ProyectoProgra5\Proyectoprogra5.DataAccess\obj\Debug\net6.0\Proyectoprogra5.DataAccess.pdb
+C:\Users\Daiber CB\Desktop\ProyectoProgra5\Proyectoprogra5.DataAccess\obj\Debug\net6.0\Proyectoprogra5.DataAccess.genruntimeconfig.cache
+C:\Users\Daiber CB\Desktop\ProyectoProgra5\Proyectoprogra5.DataAccess\obj\Debug\net6.0\ref\Proyectoprogra5.DataAccess.dll
