@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace Proyectoprogra5.DataAccess.Models;
 
@@ -11,7 +12,9 @@ public partial class EncargadoServidore
 
     public bool? Alerta { get; set; }
 
-    public virtual Servidor CodigoServidorNavigation { get; set; } = null!;
 
+    [JsonIgnore]
+    public virtual Servidor CodigoServidorNavigation { get; set; } = null!;
+    [JsonIgnore]
     public virtual Usuario UsuarioNavigation { get; set; } = null!;
 }

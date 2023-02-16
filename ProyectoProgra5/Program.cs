@@ -44,6 +44,38 @@ app.MapGet("/weatherforecast", () =>
     return forecast;
 })
     .WithName("GetWeatherForecast");
+//Login
+app.MapPost("/Login", async (Usuario usu, ProyectoProgra5Context context, string id, string contraseña) =>
+{
+    try
+    {
+        if (!MiniValidator.TryValidate(usu, out var errors))
+        {
+            return Results.BadRequest(new { codigo = -2, mensaje = StatusCodes.Status404NotFound, errores = errors });
+        }
+
+        await context.Usuarios.AnyAsync<Usuario>(S => S.Usuario1 == id && S.Contraseña == contraseña);
+        await context.SaveChangesAsync();
+        return Results.Ok(
+ new
+ {
+     codigo = 0,
+     usu = usu,
+     mensaje = StatusCodes.Status200OK,
+ });
+    }
+    catch (Exception exc)
+    {
+        return Results.Json(new
+        {
+            codigo = -1,
+            mensaje = StatusCodes.Status409Conflict
+        },
+        statusCode: StatusCodes.Status409Conflict);
+
+    }
+
+});
 //Mantenimiento Servidores
 app.MapPost("/Servidor", async ([FromBody] Servidor serv, ProyectoProgra5Context context) =>
 {
@@ -83,36 +115,6 @@ app.MapGet("Servidor/{Nombre}", async (string Nombre, ProyectoProgra5Context con
         return Results.Ok(StatusCodes.Status200OK);
     }
     return Results.NotFound();
-});
-app.MapPost("/Servidor/{Nombre}/{Contraseña}", async (Servidor serv, ProyectoProgra5Context context, string id, string contraseña) =>
-{
-    try
-    {
-        if (!MiniValidator.TryValidate(serv, out var errors))
-        {
-            return Results.BadRequest(new { codigo = -2, mensaje = StatusCodes.Status404NotFound, errores = errors });
-        }
-
-        await context.Servidors.AnyAsync<Servidor>(S => S.Administrador == id && S.Contraseña == contraseña);
-        await context.SaveChangesAsync();
-        //context.Entry(para).Reference(c => c.EstadoNavigation).Load();
-        return Results.Ok(
- new
- {
-     mensaje = StatusCodes.Status200OK,
- });
-    }
-    catch (Exception exc)
-    {
-        return Results.Json(new
-        {
-            codigo = -1,
-            mensaje = StatusCodes.Status409Conflict
-        },
-        statusCode: StatusCodes.Status409Conflict);
-
-    }
-
 });
 
 app.MapPut("/Servidor/{id}", async (int id, Servidor serv, ProyectoProgra5Context context) =>
@@ -186,13 +188,15 @@ app.MapGet("ParametrosServidore/{IdServidor}", async (int Servidores, ProyectoPr
         return Results.Ok(StatusCodes.Status200OK);
     }
     return Results.NotFound();
-}); app.MapPut("/ParametrosServidore/{IdServidor}", async (int ID, ParametrosServidore para, ProyectoProgra5Context context) =>
+}); app.MapPut("/ParametrosServidore/{IdServidor}", async (int ID, int componente, int parametros, ParametrosServidore para, ProyectoProgra5Context context) =>
 {
-    var seleccionar = await context.ParametrosServidores.FindAsync(ID); if (seleccionar is null) return Results.NotFound(); seleccionar.Porcentaje = para.Porcentaje;
+    var seleccionar = await context.ParametrosServidores.FindAsync(parametros,componente,ID); if (seleccionar is null) return Results.NotFound(); 
+    seleccionar.Porcentaje = para.Porcentaje;
     await context.SaveChangesAsync(); return Results.NoContent();
-}); app.MapDelete("/ParametrosServidore/{IdParametro}", async (int IdParametro, ProyectoProgra5Context context) =>
+
+}); app.MapDelete("/ParametrosServidore/{IdParametro}", async (int IdParametro, int componente, int ID, ProyectoProgra5Context context) =>
 {
-    if (await context.ParametrosServidores.FindAsync(IdParametro) is ParametrosServidore borra)
+    if (await context.ParametrosServidores.FindAsync(IdParametro,componente,ID) is ParametrosServidore borra)
     {
         context.ParametrosServidores.Remove(borra);
         await context.SaveChangesAsync();
@@ -270,6 +274,7 @@ app.MapPost("/emails", async (string asuntoCorreo, string cuerpoCorreo, string[]
 {
     try
     {
+
         SmtpClient smtp = new SmtpClient()
         {
             Host = "smtp.gmail.com",
@@ -319,7 +324,7 @@ app.MapPut("/ManejarMonitoreo", async (int codigo, string Usuario, short tipoAle
     {
         if (await context.EncargadoServicios.AnyAsync(x => x.CodigoServicio == codigo))
         {
-            var user = await context.EncargadoServicios.FindAsync(Usuario);
+            var user = await context.EncargadoServicios.FindAsync(Usuario,codigo);
             user.Alerta = tipoAlerta == 1 ? true : false;
             context.EncargadoServicios.Update(user);
             await context.SaveChangesAsync();
@@ -327,7 +332,7 @@ app.MapPut("/ManejarMonitoreo", async (int codigo, string Usuario, short tipoAle
         }
         else if (await context.EncargadoServidores.AnyAsync(x => x.CodigoServidor == codigo))
         {
-            var user = await context.EncargadoServidores.FindAsync(Usuario);
+            var user = await context.EncargadoServidores.FindAsync(Usuario,codigo);
             user.Alerta = tipoAlerta == 1 ? true : false;
             context.EncargadoServidores.Update(user);
             await context.SaveChangesAsync();
